@@ -156,6 +156,49 @@ class UserController extends BaseController {
 		}
 	}
 
+	public function modifyPwd(){
+		$user = $this->checkLogin();
+		if ($user['groupid'] == 1) {
+			if (IS_POST) {
+				$uid = I("uid");
+				$new_password = I("new_password");
+				if (!uid || !$new_password) {
+					return $this->message("请填写完整");
+				}
+				$ret = D("User")->updatePwd($uid,$new_password);
+				if ($ret) {
+					$this->message("修改成功！",U("Home/User/manager"));
+				}else{
+					$this->message("修改失败！");
+
+				}
+			}
+		}else{
+			$this->message("请使用管理员身份登陆");
+		}
+	}
+
+	public function manager(){
+		$user = $this->checkLogin();
+
+		if ($user['groupid'] == 1) { //是否为管理员
+			if (IS_POST) {
+				$uid = I('post.uid');
+				$delete = D('user')->where('uid='.$uid)->delete($uid);
+				if ($delete) {
+					return $this->ajaxReturn(array("stat" => "success"), 'JSON');
+				}
+				return $this->ajaxReturn(array("stat" => "error"), 'JSON');
+			}
+			$items = D("User")->select();
+			$this->assign("items" , $items);
+			$this->assign("login_user" , $user);
+			$this->display();
+		} else {
+			$this->message("请使用管理员身份登陆");
+		}
+	}
+
 	//退出登录
 	public function exist(){
 		$login_user = $this->checkLogin();

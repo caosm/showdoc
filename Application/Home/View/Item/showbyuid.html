@@ -44,6 +44,15 @@
       </div>
 
       <hr>
+      <if condition="$login_user.groupid eq 1">
+        <div class="container-thumbnails">
+          <ul class="thumbnails">
+            <button class="btn btn-info" id="user-manager-del" data-uid="{$show_user.uid}">删除此用户</button>
+            <button class="btn btn-info" id="user-manager-modify" data-uid="{$show_user.uid}">修改密码</button>
+          </ul>
+        </div>
+        <hr>
+      </if>
 
     <div class="container-thumbnails">
       <ul class="thumbnails">
@@ -63,9 +72,41 @@
 
     </div> <!-- /container -->
 
+<div class="modal hide fade" id="user-modify-modal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>修改此用户密码</h3>
+  </div>
+  <div class="modal-body">
+    <form action="{:U('Home/User/modifypwd')}" method="post">
+      <input type="hidden" name="uid" class="input-block-level" value="{$show_user.uid}">
+      <input type="password" name="new_password" class="input-block-level">
+      <button class="btn btn-info" type="submit" id="user-modify-sub">修改</button>
+    </form>
+  </div>
+</div>
 
  <include file="Common/footer" />
  <script type="text/javascript">
-
-
+   <if condition="$login_user.groupid eq 1">
+       $(document).ready(function() {
+         $("#user-manager-modify").click(function () {
+           $("#user-modify-modal").modal();
+         });
+         $('#user-manager-del').click(function () {
+           var uid = $(this).attr('data-uid');
+           $.ajax({
+             url: '{:U('Home/User/manager')}',
+             type: 'post',
+             data: {uid: uid},
+             success: function (res) {
+               console.log(res);
+               if (res.stat === 'success') {
+                 window.location.href = '{:U('Home/User/manager')}';
+               }
+             }
+           });
+         });
+       });
+   </if>
  </script>
